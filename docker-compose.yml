@@ -1,0 +1,61 @@
+version: "3.7"
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - app_network
+
+  app:
+    container_name: laravel
+    build:
+      context: .
+      args:
+        - uid=1000
+        - user=www
+      dockerfile: Dockerfile
+    volumes:
+      - ./php:/usr/local/etc/php/conf.d
+    working_dir: /var/www
+    ports:
+      - "9000:9000"
+    env_file:
+      - .docker.env
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - app_network
+    links:
+      - db:mysql
+
+  db:
+    image: mysql:8.0
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    env_file:
+      - .docker.env
+    command: ['--default-authentication-plugin=mysql_native_password']
+    networks:
+      - app_network
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+
+volumes:
+  database:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

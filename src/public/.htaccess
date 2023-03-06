@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    RewriteCond %{HTTP_HOST} !=www.forsakringarna.local
+    RewriteCond %{HTTP_HOST} !^www.xn--frskringarna-icb3w.se [NC]
+    RewriteRule ^(.*)$ https://www.xn--frskringarna-icb3w.se/$1 [R=301,NC,L]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ras/([a-z0-9-]+)-hundforsakring ras_$1.html
+    RewriteRule ^ index.php [L]
+</IfModule>

@@ -1,0 +1,9 @@
+.env.backup
+.env.develop
+.env.production
+.idea
+src/storage/framework/cache/*
+src/storage/framework/views/*
+src/storage/framework/sessions/*
+src/storage/logs/*
+src/vendor/*
